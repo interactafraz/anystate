@@ -32,5 +32,9 @@ Apart from reading the whole JSON file you can also use parameters (one at a tim
 * Get value of key with `index.php?state=currentTemp` (arrays not supported)
 * Get last update timestamp for individual value `index.php?time=currentTemp` (arrays not supported)
 
+## Notes
+
+* If you're planning to handle sensitive data with this tool on a publicly accessible server you should harden your system using at least htaccess restrictions.
+
 ## License
 tba
