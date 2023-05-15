@@ -1,7 +1,7 @@
 # AnyState
-AnyState is a lightweight tool to easily store and retrieve values (like texts, numbers or arrays) in a JSON file using your own web server.
+AnyState is a lightweight tool to easily store, update and retrieve values (like texts, numbers or arrays) in a JSON file.
 
-It was developed for automated processes where different devices, apps and operating systems need to exchange data with each other in a simple and fast way. This includes workflow tools like [n8n](https://github.com/n8n-io/n8n) as well as [iOS Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios).
+It was developed for automated processes where different devices, apps and operating systems need to exchange data with each other in a simple and fast way. This includes workflow tools like [n8n](https://github.com/n8n-io/n8n), [IFTTT](https://ifttt.com/) and [Zapier](https://zapier.com/) as well as [iOS Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios).
 
 ### Possible use cases
 * Checkin at work using iOS shortcut, use AnyState to set `working` status to `true`, add timestamp to Google Sheet via n8n
@@ -10,6 +10,8 @@ It was developed for automated processes where different devices, apps and opera
 * Monitor and visualize real-time data from sensors or IoT devices (like temperature, humidity, motion detection)
 
 ## Features
+
+* Self host-able
 * Save keys and values (via POST method)
 * Get single value for specific key (via GET parameter)
 * Get timestamp for specific key (via GET parameter)
