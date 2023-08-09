@@ -18,9 +18,9 @@ function addToStates($sentData,$fp) {
 			
 			foreach ($stateData as $entryExisting) { //Check existing entries
 				if ($entryFound == false){ //If target entry not found (yet)
-					if( !empty($entryExisting[$sentKey]) ){ //If entry for sent key has a value
+					if( array_key_exists($sentKey, $entryExisting) ){ //If entry for sent key has a value (including 0 and NULL)
 						$entryFound = true;
-						
+
 						$stateData[$entryExistingCounter]['time'] = $timestamp; //Override
 						$stateData[$entryExistingCounter][$sentKey] = $sentValue; //Override
 						
