@@ -100,7 +100,7 @@ if ( file_exists($file) ) { //Check if data exists
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>AnyState</title>
+		<?php if( !isset($_GET['state']) && !isset($_GET['time']) ){echo "<title>AnyState</title>";} ?>
 	</head>
 	<body>
 		<?php 
