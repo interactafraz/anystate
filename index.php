@@ -103,7 +103,16 @@ if ( file_exists($file) ) { //Check if data exists
 		//Debug
 		//echo $data;
 		//Debug
-		$data = [$_GET['set'] => $_GET['content']];		
+		$sentValue = $_GET['content'];
+		
+		if( preg_match('/^\d+$/', $sentValue) ){ //If whole number
+			$sentValue = (int)$sentValue;
+		}
+		elseif( preg_match('/^\d+\.\d+$/', $sentValue) || preg_match('/^\.\d+$/', $sentValue)){ //If number with decimals (like "1.2" or ".5")
+			$sentValue = (float)$sentValue;
+		}		
+		
+		$data = [$_GET['set'] => $sentValue];		
 		addToStates( $data,$fp );
 		echo 'success';
 	}

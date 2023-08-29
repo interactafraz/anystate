@@ -12,7 +12,7 @@ It was developed for automated processes where different devices, apps and opera
 ## Features
 
 * Self host-able
-* Save keys and values (via POST or GET method)
+* Save keys and values (via POST or GET requests)
 * Get single value for specific key (via GET parameter)
 * Get timestamp for specific key (via GET parameter)
 * Limit maximum storage time for keys (allows keys to expire)
@@ -30,7 +30,7 @@ For simple use cases you can set a key and its value with URL parameters:
 
     index.php?set=currentTemp&content=26
 
-> Sanitization is not performed on GET requests. So special characters should be escaped before sending them to AnyState.
+> Sanitization is not performed on GET requests. So special characters should be escaped before sending them to AnyState. Numbers will be converted to int/float variables automatically.
 
 ### Save data - POST
 AnyState expects POST data in the following JSON format:
