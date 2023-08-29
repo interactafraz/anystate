@@ -12,7 +12,7 @@ It was developed for automated processes where different devices, apps and opera
 ## Features
 
 * Self host-able
-* Save keys and values (via POST method)
+* Save keys and values (via POST or GET method)
 * Get single value for specific key (via GET parameter)
 * Get timestamp for specific key (via GET parameter)
 * Limit maximum storage time for keys (allows keys to expire)
@@ -25,12 +25,22 @@ It was developed for automated processes where different devices, apps and opera
 * Copy files to web server
 
 ## Usage
-### Save data
-The script expects POST data in the following format
+### Save data - GET
+For simple use cases you can set a key and its value with URL parameters:
+
+    index.php?set=currentTemp&content=26
+
+> Sanitization is not performed on GET requests. So special characters should be escaped before sending them to AnyState.
+
+### Save data - POST
+AnyState expects POST data in the following JSON format:
 
     {"currentTemp": "26","currentConditions": "rainy"}
 
-**iOS Shortcuts:** To generate this format from an iOS Shortcut, follow this guide:
+> Sanitization is not performed on POST requests. So special characters should be escaped before sending them to AnyState.
+	
+#### Example: iOS Shortcuts
+To generate this format from an iOS Shortcut, follow these instructions:
 1. Create a `dictionary` and add your keys/values as items
 2. Add the dictionary to a `text` action
 3. Use a `Get Contents of URL` action to send the data to your AnyState instance. Set it up like this:
@@ -39,7 +49,33 @@ The script expects POST data in the following format
 * Request Body: Form
 * Request Body field (key): data
 * Request Body field (Text): Text from `text` action
+
+#### Example: PHP
+To submit data with a PHP script use this example function ([Source](https://stackoverflow.com/questions/5647461/how-do-i-send-a-post-request-with-php/6609181#6609181)):
+
+    function sendToAnyState($keyData,$valueData){
+        $url = 'https://example.com/anystate/';
+        $data = [$keyData => $valueData];
+
+        // use key 'http' even if you send the request to https://...
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query( ['data' => json_encode($data, JSON_PRETTY_PRINT)] ),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        //if ($result === false) {
+            /* Handle error */
+        //}
+
+        //var_dump($result);
 	
+    }
+
 ### Read data
 Apart from reading the whole JSON file you can also use parameters (one at a time) to get the data for specific keys. If you omit these parameters the script will output a plain preview of all keys and values (for better readability this doesn't output arrays).
 

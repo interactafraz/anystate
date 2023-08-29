@@ -13,38 +13,49 @@ function addToStates($sentData,$fp) {
 	
 	if( count($stateData) > 0 ){ //If any entry exists
 		foreach ($sentData as $sentKey => $sentValue) {
-			$entryFound = false;
-			$entryExistingCounter = 0;
-			
-			foreach ($stateData as $entryExisting) { //Check existing entries
-				if ($entryFound == false){ //If target entry not found (yet)
-					if( array_key_exists($sentKey, $entryExisting) ){ //If entry for sent key has a value (including 0 and NULL)
-						$entryFound = true;
+			if ($sentKey != "time"){
+				$entryFound = false;
+				$entryExistingCounter = 0;
+				
+				foreach ($stateData as $entryExisting) { //Check existing entries
+					if ($entryFound == false){ //If target entry not found (yet)
+						if( array_key_exists($sentKey, $entryExisting) ){ //If entry for sent key has a value (including 0 and NULL)
+							$entryFound = true;
 
-						$stateData[$entryExistingCounter]['time'] = $timestamp; //Override
-						$stateData[$entryExistingCounter][$sentKey] = $sentValue; //Override
-						
-						break; //Stop searching in existing entries
+							$stateData[$entryExistingCounter]['time'] = $timestamp; //Override
+							$stateData[$entryExistingCounter][$sentKey] = $sentValue; //Override
+							
+							break; //Stop searching in existing entries
+						}
 					}
+					
+					$entryExistingCounter = $entryExistingCounter + 1;
 				}
 				
-				$entryExistingCounter = $entryExistingCounter + 1;
+				if ($entryFound == false){ //If entry not found at all
+					$entry = array();
+					$entry['time'] = $timestamp;
+					$entry[$sentKey] = $sentValue;
+					array_push($stateData, $entry); //Add to existing entries	
+				}	
+			}
+			else{
+				die ('Error: Key cannot be "time"');
 			}
 			
-			if ($entryFound == false){ //If entry not found at all
-				$entry = array();
-				$entry['time'] = $timestamp;
-				$entry[$sentKey] = $sentValue;
-				array_push($stateData, $entry); //Add to existing entries	
-			}
 		}
 	}
 	else{ //No entry exists
 		foreach ($sentData as $key => $value) {
-			$entry = array();
-			$entry['time'] = $timestamp;
-			$entry[$key] = $value;
-			array_push($stateData, $entry); //Add to existing entries			
+			if ($sentKey != "time"){
+				$entry = array();
+				$entry['time'] = $timestamp;
+				$entry[$key] = $value;
+				array_push($stateData, $entry); //Add to existing entries
+			}
+			else{
+				die ('Error: Key cannot be "time"');
+			}
 		}
 	}
 	
@@ -87,6 +98,14 @@ if ( file_exists($file) ) { //Check if data exists
 		//fclose($debug);
 		//Debug
 		addToStates( json_decode($_POST['data'], true),$fp );
+	}
+	elseif( !empty($_GET) && isset($_GET['set']) && isset($_GET['content']) ){
+		//Debug
+		//echo $data;
+		//Debug
+		$data = [$_GET['set'] => $_GET['content']];		
+		addToStates( $data,$fp );
+		echo 'success';
 	}
 	
 	flock($fp, LOCK_UN); //Unlock file for further access
