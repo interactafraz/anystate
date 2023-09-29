@@ -79,7 +79,8 @@ To submit data with a PHP script use this example function ([Source](https://sta
 ### Read data
 Apart from reading the whole JSON file you can also use parameters (one at a time) to get the data for specific keys. If you omit these parameters the script will output a plain preview of all keys and values (for better readability this doesn't output arrays).
 
-* Get value of key with `index.php?state=currentTemp` (arrays not supported)
+* Get value of key in plain text format with `index.php?state=currentTemp` (arrays not supported)
+* Get value of key in JSON format with `index.php?state=currentTemp&format=json` (arrays supported)
 * Get last update timestamp for individual value `index.php?time=currentTemp` (arrays not supported)
 
 ## Roadmap

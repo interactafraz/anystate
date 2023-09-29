@@ -115,10 +115,46 @@ if ( file_exists($file) ) { //Check if data exists
 		$data = [$_GET['set'] => $sentValue];		
 		addToStates( $data,$fp );
 		echo 'success';
+		die;
 	}
 	
 	flock($fp, LOCK_UN); //Unlock file for further access
 	fclose($fp);
+}
+
+if (!empty($_GET)) { 
+	if( isset($_GET['state']) ){ //If specific value(s) requested
+		
+		foreach ($stateData as $entryExisting) { //Get every entry
+			foreach ($entryExisting as $key => $value) { //Get key and timestamp values
+				if ($_GET['state'] == $key){ //If target key has been found
+					
+					if( isset($_GET['format']) && $_GET['format'] == "json" ){ //If requested as JSON
+						echo json_encode($value);
+					}
+					else{
+						echo $value;
+					}					
+							
+					break 2;
+				}
+			}
+		}
+		
+		die;
+	}
+	elseif ( isset($_GET['time']) ){ //If time value for specific key requested
+		foreach ($stateData as $entryExisting) { //Get every entry
+			foreach ($entryExisting as $key => $value) { //Get key and timestamp values
+				if ($_GET['time'] == $key){ //If target key has been found
+					echo $entryExisting['time'];
+					break 2;
+				}
+			}
+			
+		}
+		die;
+	}
 }
 
 
@@ -133,63 +169,36 @@ if ( file_exists($file) ) { //Check if data exists
 	<body>
 		<?php 
 			if ( file_exists($file) ) { //Check if data exists
-				
-				if (!empty($_GET)) { 
-					if ( isset($_GET['state']) ){ //If specific value(s) requested
-						foreach ($stateData as $entryExisting) { //Get every entry
-							foreach ($entryExisting as $key => $value) { //Get key and timestamp values
-								if ($_GET['state'] == $key){ //If target key has been found
-									echo $value;
-									break 2;
-								}
+
+				foreach ($stateData as $index => $entry) {
+					$elementCount = count($entry);
+					$counter = 0;
+					
+					foreach ($entry as $key => $value) {
+						$counter = $counter + 1;
+						
+						if($key == 'time'){
+							$time = DateTime::createFromFormat('U', $value)->setTimezone(new DateTimeZone($previewTimeZone))->format('d.m.Y \a\t H:i'); //Convert to datetime object							
+							echo $time . ' - ';
+						}
+						else{ //Value
+							if ( is_array($value) ){ //If value is array
+									echo $key . ' = ' . 'Array';									
+							}
+							else{
+								echo $key . ' = ' . $value;
 							}
 						}
+						
+						
+						if( $counter != $elementCount && $key != 'time'){
+							echo ' | ';
+						}
+						
 					}
-					elseif ( isset($_GET['time']) ){ //If time value for specific key requested
-						foreach ($stateData as $entryExisting) { //Get every entry
-							foreach ($entryExisting as $key => $value) { //Get key and timestamp values
-								if ($_GET['time'] == $key){ //If target key has been found
-									echo $entryExisting['time'];
-									break 2;
-								}
-							}
-							
-						}
-					}
-						
+					
+					echo "<br>";
 				}
-				else {
-					foreach ($stateData as $index => $entry) {
-						$elementCount = count($entry);
-						$counter = 0;
-						
-						foreach ($entry as $key => $value) {
-							$counter = $counter + 1;
-							
-							if($key == 'time'){
-								$time = DateTime::createFromFormat('U', $value)->setTimezone(new DateTimeZone($previewTimeZone))->format('d.m.Y \a\t H:i'); //Convert to datetime object							
-								echo $time . ' - ';
-							}
-							else{ //Value
-								if ( is_array($value) ){ //If value is array
-										echo $key . ' = ' . 'Array';									
-								}
-								else{
-									echo $key . ' = ' . $value;
-								}
-							}
-							
-							
-							if( $counter != $elementCount && $key != 'time'){
-								echo ' | ';
-							}
-							
-						}
-						
-						echo "<br>";
-					}	
-				}
-			
 				
 			}
 		?>
