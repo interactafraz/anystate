@@ -131,10 +131,12 @@ if (!empty($_GET)) {
 					
 					if( isset($_GET['format']) && $_GET['format'] == "json" ){ //If requested as JSON
 						if( is_array($value) ){ //If value is array
+							header('Content-Type: application/json; charset=utf-8');
 							echo json_encode($value);
 						}
 						else{
 							$jsonArray = ["value" => $value];
+							header('Content-Type: application/json; charset=utf-8');
 							echo json_encode($jsonArray);
 						}
 						
