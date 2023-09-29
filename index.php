@@ -130,7 +130,14 @@ if (!empty($_GET)) {
 				if ($_GET['state'] == $key){ //If target key has been found
 					
 					if( isset($_GET['format']) && $_GET['format'] == "json" ){ //If requested as JSON
-						echo json_encode($value);
+						if( is_array($value) ){ //If value is array
+							echo json_encode($value);
+						}
+						else{
+							$jsonArray = ["value" => $value];
+							echo json_encode($jsonArray);
+						}
+						
 					}
 					else{
 						echo $value;
