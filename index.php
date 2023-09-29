@@ -164,6 +164,29 @@ if (!empty($_GET)) {
 		}
 		die;
 	}
+	elseif( isset($_GET['filter']) ){ //If data should be filtered
+		if($_GET['filter'] == "values"){ //If only keys and values requested
+			$dataFiltered = array();
+			if ( file_exists($file) ) { //Check if data exists
+			
+				foreach ($stateData as $index => $entry) { //Get every entry
+					foreach ($entry as $key => $value) { //Get keys and values
+						if($key != 'time'){ 
+							$dataFiltered[$key] = $value;
+						}						
+					}						
+				}
+				
+			}
+			
+			if( isset($_GET['format']) && $_GET['format'] == "json" ){ //If requested as JSON			
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode($dataFiltered);				
+			}
+		}
+		
+		die;
+	}
 }
 
 
