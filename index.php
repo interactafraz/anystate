@@ -93,7 +93,7 @@ if ( file_exists($file) ) { //Check if data exists
 	
 	//Debug
 	//if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-		$debug = fopen('debug.txt', 'w');
+		//$debug = fopen('debug.txt', 'w');
 		//fwrite($debug, print_r($_POST, true)); //Save array data to file
 		//fwrite($debug, $_POST['data']); //Save data content to file
 		//fclose($debug);		

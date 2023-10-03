@@ -39,7 +39,7 @@ AnyState expects one *data* key with a *value* that contains your **JSON encoded
 1. To set *currentTemp* to *26* and *currentConditions* to *rainy* you need to construct a **string** in the following format: `{"currentTemp": 26,"currentConditions": "rainy"}`
 2. You should then add this string (encoded in JSON) to the *data* key. So the final POST body with a `application/x-www-form-urlencoded` header would look like this
 
-	data={"currentTemp":26,"currentConditions":"rainy"}
+    data={"currentTemp":26,"currentConditions":"rainy"}
 
 > Sanitization is not performed on POST requests. So special characters should be escaped before sending them to AnyState.
 	
