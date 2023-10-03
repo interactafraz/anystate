@@ -91,12 +91,16 @@ if ( file_exists($file) ) { //Check if data exists
 		$entryExistingCounter = $entryExistingCounter + 1;
 	}
 	
+	//Debug
+	//if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+		$debug = fopen('debug.txt', 'w');
+		//fwrite($debug, print_r($_POST, true)); //Save array data to file
+		//fwrite($debug, $_POST['data']); //Save data content to file
+		//fclose($debug);		
+	//}
+	//Debug
+	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty(json_decode($_POST['data'], true))) {
-		//Debug
-		//$debug = fopen('debug.txt', 'w');
-		//fwrite($debug, $_POST); //Save new data to file
-		//fclose($debug);
-		//Debug
 		addToStates( json_decode($_POST['data'], true),$fp );
 	}
 	elseif( !empty($_GET) && isset($_GET['set']) && isset($_GET['content']) ){
