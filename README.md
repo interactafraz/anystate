@@ -1,7 +1,8 @@
 # AnyState
 AnyState is a lightweight tool to easily store, update and retrieve values (like texts, numbers or arrays) in a JSON file.
 
-It was developed for automated processes where different devices, apps and operating systems need to exchange data with each other in a simple and fast way. This includes workflow tools like [n8n](https://github.com/n8n-io/n8n), [IFTTT](https://ifttt.com/) and [Zapier](https://zapier.com/) as well as [iOS Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios).
+It was developed for automated processes where different devices, apps and operating systems need to exchange data with each other in a simple and fast way. This includes workflow tools like [n8n](https://github.com/n8n-io/n8n), [IFTTT](https://ifttt.com/) and [Zapier](https://zapier.com/) as well as [
+Home Assistant](https://github.com/home-assistant) and [iOS Shortcuts](https://support.apple.com/guide/shortcuts/welcome/ios).
 
 ### Possible use cases
 * Checkin at work using iOS shortcut, use AnyState to set `working` status to `true`, add timestamp to Google Sheet via n8n
@@ -39,10 +40,39 @@ AnyState expects one *data* key with a *value* that contains your **JSON encoded
 1. To set *currentTemp* to *26* and *currentConditions* to *rainy* you need to construct a **string** in the following format: `{"currentTemp": 26,"currentConditions": "rainy"}`
 2. You should then add this string (encoded in JSON) to the *data* key. So the final POST body with a `application/x-www-form-urlencoded` header would look like this
 
-    data={"currentTemp":26,"currentConditions":"rainy"}
+    `data={"currentTemp":26,"currentConditions":"rainy"}`
 
 > Sanitization is not performed on POST requests. So special characters should be escaped before sending them to AnyState.
-	
+
+#### Example: Home Assistant
+To create a switch that toggles between two states:
+
+```
+switch:
+  - platform: rest
+    resource: https://example.com/anystate/
+    state_resource: https://example.com/anystate/?state=working&format=json
+    name: "Working status"
+    body_on: 'data={"working":"true"}'
+    body_off: 'data={"working":"false"}'
+    is_on_template: "{{ value_json.value == 'true' }}"
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+    verify_ssl: true
+```
+---
+
+To create an entity that displays a value:
+
+```
+rest:
+  - resource: "https://example.com/anystate/?filter=values&format=json"
+    scan_interval: 3600
+    sensor:
+      - name: "AnyState Values"
+        value_template: "{{ value_json.currentTemp }}"
+```
+
 #### Example: iOS Shortcuts
 To generate this format from an iOS Shortcut, follow these instructions:
 1. Create a `dictionary` and add your keys/values as items

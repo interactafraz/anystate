@@ -47,7 +47,7 @@ function addToStates($sentData,$fp) {
 	}
 	else{ //No entry exists
 		foreach ($sentData as $key => $value) {
-			if ($sentKey != "time"){
+			if ($key != "time"){
 				$entry = array();
 				$entry['time'] = $timestamp;
 				$entry[$key] = $value;
@@ -70,61 +70,67 @@ function addToStates($sentData,$fp) {
 	fwrite($fp, json_encode($stateData)); //Save new data to file
 }
 
-if ( file_exists($file) ) { //Check if data exists
-	
-	$fp = fopen($file, 'r+');
+if ( !file_exists($file) ) { //Check if data does not exist yet
+	$fp = fopen($file, 'w+');
 	flock($fp, LOCK_EX); //Lock file to avoid other processes writing to it simlutanously 
-
-	$jsonData = stream_get_contents($fp);
-	if($jsonData == ""){
-		echo "Could not read Log file (maybe empty)";
-		die;
-	}
-	$stateData = json_decode($jsonData, true);
-	
-	$entryExistingCounter = 0;
-	
-	foreach ($stateData as $entryExisting) {
-		if ($entryExisting['time'] < date("U",strtotime("-".$timeLimit." days")) ){//If older than limit
-			unset($stateData[$entryExistingCounter]);
-		}
-		$entryExistingCounter = $entryExistingCounter + 1;
-	}
-	
-	//Debug
-	//if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-		//$debug = fopen('debug.txt', 'w');
-		//fwrite($debug, print_r($_POST, true)); //Save array data to file
-		//fwrite($debug, $_POST['data']); //Save data content to file
-		//fclose($debug);		
-	//}
-	//Debug
-	
-	if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty(json_decode($_POST['data'], true))) {
-		addToStates( json_decode($_POST['data'], true),$fp );
-	}
-	elseif( !empty($_GET) && isset($_GET['set']) && isset($_GET['content']) ){
-		//Debug
-		//echo $data;
-		//Debug
-		$sentValue = $_GET['content'];
-		
-		if( preg_match('/^\d+$/', $sentValue) ){ //If whole number
-			$sentValue = (int)$sentValue;
-		}
-		elseif( preg_match('/^\d+\.\d+$/', $sentValue) || preg_match('/^\.\d+$/', $sentValue)){ //If number with decimals (like "1.2" or ".5")
-			$sentValue = (float)$sentValue;
-		}		
-		
-		$data = [$_GET['set'] => $sentValue];		
-		addToStates( $data,$fp );
-		echo 'success';
-		die;
-	}
-	
+	fwrite($fp, json_encode(new stdClass)); //Save empty data to file	
 	flock($fp, LOCK_UN); //Unlock file for further access
 	fclose($fp);
 }
+
+$fp = fopen($file, 'r+');
+flock($fp, LOCK_EX); //Lock file to avoid other processes writing to it simlutanously 
+
+$jsonData = stream_get_contents($fp);
+if($jsonData == ""){
+	echo "Could not read Log file (maybe empty)";
+	die;
+}
+$stateData = json_decode($jsonData, true);
+
+$entryExistingCounter = 0;
+
+foreach ($stateData as $entryExisting) {
+	if ($entryExisting['time'] < date("U",strtotime("-".$timeLimit." days")) ){//If older than limit
+		unset($stateData[$entryExistingCounter]);
+	}
+	$entryExistingCounter = $entryExistingCounter + 1;
+}
+
+//Debug
+//if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+	//$debug = fopen('debug.txt', 'w');
+	//fwrite($debug, print_r($_POST, true)); //Save array data to file
+	//fwrite($debug, $_POST['data']); //Save data content to file
+	//fclose($debug);		
+//}
+//Debug
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty(json_decode($_POST['data'], true))) {
+	addToStates( json_decode($_POST['data'], true),$fp );
+}
+elseif( !empty($_GET) && isset($_GET['set']) && isset($_GET['content']) ){
+	//Debug
+	//echo $data;
+	//Debug
+	$sentValue = $_GET['content'];
+	
+	if( preg_match('/^\d+$/', $sentValue) ){ //If whole number
+		$sentValue = (int)$sentValue;
+	}
+	elseif( preg_match('/^\d+\.\d+$/', $sentValue) || preg_match('/^\.\d+$/', $sentValue)){ //If number with decimals (like "1.2" or ".5")
+		$sentValue = (float)$sentValue;
+	}		
+	
+	$data = [$_GET['set'] => $sentValue];		
+	addToStates( $data,$fp );
+	echo 'success';
+	die;
+}
+
+flock($fp, LOCK_UN); //Unlock file for further access
+fclose($fp);
+
 
 if (!empty($_GET)) { 
 	if( isset($_GET['state']) ){ //If specific value(s) requested
