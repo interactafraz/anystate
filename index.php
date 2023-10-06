@@ -1,4 +1,5 @@
 <?php 
+header('Access-Control-Allow-Origin: *'); 
 
 $file = "states.json";
 $timeLimit = 365; //How many days a state should be stored
