@@ -3,12 +3,34 @@ header('Access-Control-Allow-Origin: *');
 
 $file = "states.json";
 $timeLimit = 365; //How many days a state should be stored
-$previewTimeZone = "Europe/Berlin";//Only for preview output
+$previewTimeZone = "Europe/Berlin"; //Only for preview output
+$triggerWebhookUrl = "http://n8n:5678/webhook/push-anystate-state-to-mqtt"; //URL that gets called after every entry update (optional, leave empty to disable)
 
 $stateData = array();
+
+function callTriggerWebhook($sentData){
+	global $triggerWebhookUrl;
+	
+	if($triggerWebhookUrl != ""){
+		$ch = curl_init($triggerWebhookUrl);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT_MS, 150);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($sentData));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+		curl_exec($ch);
+		curl_close($ch);
+	}
+	
+}
+
 function addToStates($sentData,$fp) {
 	global $stateData;
-	global $timeLimit;
 	
 	$timestamp = time();	
 	
@@ -26,6 +48,8 @@ function addToStates($sentData,$fp) {
 							$stateData[$entryExistingCounter]['time'] = $timestamp; //Override
 							$stateData[$entryExistingCounter][$sentKey] = $sentValue; //Override
 							
+							callTriggerWebhook($sentData);
+							
 							break; //Stop searching in existing entries
 						}
 					}
@@ -37,8 +61,10 @@ function addToStates($sentData,$fp) {
 					$entry = array();
 					$entry['time'] = $timestamp;
 					$entry[$sentKey] = $sentValue;
-					array_push($stateData, $entry); //Add to existing entries	
-				}	
+					array_push($stateData, $entry); //Add to existing entries
+					
+					callTriggerWebhook($sentData);
+				}
 			}
 			else{
 				die ('Error: Key cannot be "time"');
@@ -53,6 +79,8 @@ function addToStates($sentData,$fp) {
 				$entry['time'] = $timestamp;
 				$entry[$key] = $value;
 				array_push($stateData, $entry); //Add to existing entries
+				
+				callTriggerWebhook($sentData);
 			}
 			else{
 				die ('Error: Key cannot be "time"');

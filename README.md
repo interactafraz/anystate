@@ -18,6 +18,7 @@ Home Assistant](https://github.com/home-assistant) and [iOS Shortcuts](https://s
 * Get timestamp for specific key (via GET parameter)
 * Limit maximum storage time for keys (allows keys to expire)
 * Preview keys and values in browser
+* Trigger webhook after updating entries
 
 ## Prerequisites
 * Common web server with PHP support
